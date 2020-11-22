@@ -8,6 +8,7 @@ use App\Models\Category;
 use Facade\FlareClient\Api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 
 class ExpenseController extends Controller
@@ -20,16 +21,7 @@ class ExpenseController extends Controller
      */
     public function index(Request $request)
     {
-        // $token = $request->bearerToken();
-        // $user = User::where('api_token', $token)->first();
-
-        // $userId = $user->id;
-        //$expenses = DB::table('expenses')->where('user_id', '=', Auth::user()->id);
-        // $user = $request->user('api');
-        // echo($user);
-        
         $expenses = Expense::where('user_id', Auth::id())->get();
-        //var_dump($expenses);
         return response()->json($expenses);
     }
 
@@ -38,9 +30,49 @@ class ExpenseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function fetchByName()
     {
-        //
+        $expenses = Expense::where('user_id', Auth::id())->orderBy('name', 'asc')->get();
+        return response()->json($expenses);
+    }
+
+    public function fetchByCategory()
+    {
+        $expenses = Expense::where('user_id', Auth::id())->orderBy('category_id', 'asc')->get();
+        return response()->json($expenses);
+    }
+
+    public function fetchByDate()
+    {
+        $expenses = Expense::where('user_id', Auth::id())->orderBy('created_at', 'desc')->get();
+        return response()->json($expenses);
+    }
+
+    public function fetchByAmount()
+    {
+        $expenses = Expense::where('user_id', Auth::id())->orderBy('amount', 'desc')->get();
+        return response()->json($expenses);
+    }
+
+
+    public function fetchByFilterDate(Request $request)
+    {   
+
+        $startDate = $request->start_date;
+            
+
+        $endDate = $request->end_date;
+            
+
+        $expenses = Expense::where('user_id', Auth::id())->where('created_at','>=', $startDate)->where('created_at', '<=', $endDate)->get();
+        return response()->json($expenses);
+    }
+
+    public function fetchFilterByCat(Request $request)
+    {
+        $category = $request->categoryId;
+        $expenses = Expense::where('user_id', Auth::id())->where('category_id', '=', $category)->get();
+        return response()->json($expenses);
     }
 
     /**
@@ -55,10 +87,10 @@ class ExpenseController extends Controller
             'name' => 'required',
             'category_id' => 'required',
             'user_id' => 'required',
-            'amount' => 'required'
+            'amount' => 'required',
+            'created_at' => 'required'
             
         ]);
-        //dd($request);
         $expense = Expense::create($request->all());
         return response()->json(['message'=> 'expense created', 
         'expense' => $expense]);
@@ -101,9 +133,6 @@ class ExpenseController extends Controller
             'amount' => 'required',
             'category_id' => 'required' //optional if you want this to be required
         ]);
-        // $expense->name = $request->name();
-        // $expense->amount = $request->amount();
-        // $expense->category = $request->category();
         $expense->update($validatedAttributes);
         
         return response()->json([

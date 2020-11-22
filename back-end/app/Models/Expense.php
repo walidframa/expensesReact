@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Auth;
 class Expense extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'category_id', 'amount', 'user_id'];
+
+    
+    protected $fillable = ['name', 'category_id', 'amount', 'user_id', 'created_at'];
     
     public function user()
     {

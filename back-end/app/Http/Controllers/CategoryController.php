@@ -41,7 +41,6 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required',
-             //optional if you want this to be required
         ]);
         $category = Category::create($request->all());
         return response()->json(['message'=> 'category created', 
@@ -54,10 +53,16 @@ class CategoryController extends Controller
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function show()
+    public function show(Request $request)
     {
+        $startDate = $request->start_date;
+            
+
+        $endDate = $request->end_date; 
+
         $expense = DB::table('expenses')
         ->select(DB::raw('category_id as category_id'), DB::raw('SUM(amount) as total_expense'))
+        ->where('created_at','>=', $startDate)->where('created_at', '<=', $endDate)
         ->groupBy(DB::raw('category_id'))
         ->get();
         return response()->json($expense);
@@ -85,7 +90,6 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required'
-             //optional if you want this to be required
         ]);
         $category->name = $request->name();
         $category->save();

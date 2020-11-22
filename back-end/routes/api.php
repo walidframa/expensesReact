@@ -35,6 +35,18 @@ Route::group([
 
     Route::get('expenses', [ExpenseController::class, 'index'])->name('expenses.index');
 
+    Route::get('expenses/sortName', [ExpenseController::class, 'fetchByName'])->name('expenses.fetchByName');
+
+    Route::get('expenses/sortCategory', [ExpenseController::class, 'fetchByCategory'])->name('expenses.fetchByCategory');
+
+    Route::get('expenses/sortDate', [ExpenseController::class, 'fetchByDate'])->name('expenses.fetchByDate');
+
+    Route::get('expenses/sortAmount', [ExpenseController::class, 'fetchByAmount'])->name('expenses.fetchByAmount');
+
+    Route::get('expenses/filterDate', [ExpenseController::class, 'fetchByFilterDate'])->name('expenses.fetchByFilterDate');
+
+    Route::get('expenses/filterCategory', [ExpenseController::class, 'fetchFilterByCat'])->name('expenses.fetchFilterByCat');
+
     Route::get('expenses/category', [CategoryController::class, 'index'])->name('category.index');
 
     Route::get('expenses/category/group', [CategoryController::class, 'show'])->name('category.show');
