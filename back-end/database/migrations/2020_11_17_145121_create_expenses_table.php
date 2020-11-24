@@ -19,6 +19,7 @@ class CreateExpensesTable extends Migration
             $table->unsignedBigInteger('category_id');
             $table->string('name');
             $table->integer('amount');
+            $table->mediumText('image')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')

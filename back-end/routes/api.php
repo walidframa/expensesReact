@@ -55,7 +55,9 @@ Route::group([
 
     Route::get('expenses/{expense}', [ExpenseController::class, 'show'])->name('expenses.show');
 
-    Route::put('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
+    Route::post('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
+
+    Route::post('expenses/image/{expense}', [ExpenseController::class, 'updateImage'])->name('expenses.updateImage');
 
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
 });

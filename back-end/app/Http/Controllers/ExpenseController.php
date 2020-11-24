@@ -81,17 +81,33 @@ class ExpenseController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Expense $expense)
     {
-        $request->validate([
+        if($request->get('imageValue'))
+        {
+           $image = $request->get('imageValue');
+           $name = time().'.' . explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
+           \Image::make($request->get('imageValue'))->save(public_path('images/').$name);
+         }
+ 
+         $request->validate([
             'name' => 'required',
             'category_id' => 'required',
             'user_id' => 'required',
             'amount' => 'required',
-            'created_at' => 'required'
+            'created_at' => 'required',
+            //'image'=> 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
             
         ]);
-        $expense = Expense::create($request->all());
+        $expense->name = $request->name;
+        $expense->user_id = $request->user_id;
+        $expense->category_id = $request->category_id;
+        $expense->amount = $request->amount;
+        $expense->created_at = $request->created_at;
+        $expense->image = $name;
+        
+        $expense->save();
+
         return response()->json(['message'=> 'expense created', 
         'expense' => $expense]);
     }
@@ -127,18 +143,56 @@ class ExpenseController extends Controller
      */
     public function update(Request $request, Expense $expense)
     {
-        
-        $validatedAttributes = request()->validate([
+
+        $request->validate([
             'name' => 'required',
             'amount' => 'required',
-            'category_id' => 'required' //optional if you want this to be required
+            'category_id' => 'required',
+            'created_at' => 'required', 
         ]);
-        $expense->update($validatedAttributes);
+
+        $expense->name = $request->name;
+        
+        $expense->category_id = $request->category_id;
+        $expense->amount = $request->amount;
+        $expense->created_at = $request->created_at;
+
+        $expense->update();
+
+        // if($request->get('imageValue'))
+        // {
+        //    $image = $request->get('imageValue');
+        //    $name = time().'.' . explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
+        //    \Image::make($request->get('imageValue'))->save(public_path('images/').$name);
+        //    $data->image = $name;
+        //    $data->save();
+        //  }
+
+        
+        // $expense->update($validatedAttributes);
         
         return response()->json([
             'message' => 'expense updated!',
             'expense' => $expense
         ]);
+    }
+
+    public function updateImage(Request $request, Expense $expense)
+    {
+        if($request->get('imageValue'))
+        {
+           $image = $request->get('imageValue');
+           $name = time().'.' . explode('/', explode(':', substr($image, 0, strpos($image, ';')))[1])[1];
+           \Image::make($request->get('imageValue'))->save(public_path('images/').$name);
+         }
+        
+        $data = Expense::find($request->id);
+        $data->image = $name;
+        
+        $data->save();
+
+        return response()->json(['message'=> 'expense created', 
+        'expense' => $data]);
     }
 
     /**
